@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.example.Main",  // Replace with your main class
+            "projectName": "javafx-app",
+            "vmArgs": "-cp \"C:/Users/HP/Documents/mysql-connector-j-9.0.0.jar\""  // Path to your MySQL connector JAR file
+        }
+    ]
+}
