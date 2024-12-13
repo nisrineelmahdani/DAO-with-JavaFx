@@ -1,46 +1,48 @@
 package com.example;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class studentImpl implements studentDao {
+public class UserImpl implements UserDao {
     private Connection conn;
 
-    public studentImpl(db  conn) {
+    public UserImpl(db conn) {
         this.conn = conn.getConnection();
     }
 
     @Override
-    public void addUser(student user) {
+    public void addUser(User user) {
         try {
-            String sql = "INSERT INTO students (id, nom, prenom) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO users (id, nom, prenom, email, type) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, user.getId());
             pstmt.setString(2, user.getNom());
             pstmt.setString(3, user.getPrenom());
-         
+            pstmt.setString(4, user.getEmail());
+            pstmt.setString(5, user.getType());
             pstmt.executeUpdate();
-          
-            System.out.println("added");
+            System.out.println("User added successfully!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public student getUserById(int id) {
-        student user = null;
+    public User getUserById(int id) {
+        User user = null;
         try {
-            String sql = "SELECT * FROM students WHERE id = ?";
+            String sql = "SELECT * FROM users WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                user = new student(
+                user = new User(
                     rs.getInt("id"),
                     rs.getString("nom"),
-                    rs.getString("prenom")
-                  
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getString("type")
                 );
             }
         } catch (SQLException e) {
@@ -50,18 +52,19 @@ public class studentImpl implements studentDao {
     }
 
     @Override
-    public List<student> getAllUsers() {
-        List<student> users = new ArrayList<>();
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM students";
+            String sql = "SELECT * FROM users";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                users.add(new student(
+                users.add(new User(
                     rs.getInt("id"),
                     rs.getString("nom"),
-                    rs.getString("prenom")
-                  
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getString("type")
                 ));
             }
         } catch (SQLException e) {
@@ -70,34 +73,33 @@ public class studentImpl implements studentDao {
         return users;
     }
 
-
     @Override
-    public void deleteUser(int id) {
+    public void updateUser(User user) {
         try {
-            String sql = "DELETE FROM students WHERE id = ?";
+            String sql = "UPDATE users SET nom = ?, prenom = ?, email = ?, type = ? WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, id);
+            pstmt.setString(1, user.getNom());
+            pstmt.setString(2, user.getPrenom());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setString(4, user.getType());
+            pstmt.setInt(5, user.getId());
             pstmt.executeUpdate();
+            System.out.println("User updated successfully!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void updateUser(student user) {
+    public void deleteUser(int id) {
         try {
-            String sql = "UPDATE students SET nom= ?, prenom= ? WHERE id = ?";
+            String sql = "DELETE FROM users WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, user.getNom());
-            pstmt.setString(2, user.getPrenom());
-     
-            pstmt.setInt(3, user.getId());
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
+            System.out.println("User deleted successfully!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 }
-
- 
-

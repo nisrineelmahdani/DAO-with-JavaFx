@@ -5,59 +5,67 @@ public class event {
     private String nom;
     private String date;
     private String description;
-     public event(int id, String nom, String date, String description){
+    private int userId; 
+
+  
+    public event(int id, String nom, String date, String description, int userId) {
         this.id = id;
         this.nom = nom;
-        this.date= date;
-        this.description=description;
-     }
-   
+        this.date = date;
+        this.description = description;
+        this.userId = userId;
+    }
 
- public int getId() {
-    return id;
-}
+ 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
-public void setId(int id) {
-    this.id = id;
-}
+    public String getNom() {
+        return nom;
+    }
 
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-public String getNom() {
-    return nom;
-}
+    public String getDate() {
+        return date;
+    }
 
-public void setNom(String nom) {
-    this.nom = nom;
-}
+    public void setDate(String date) {
+        this.date = date;
+    }
 
+    public String getDescription() {
+        return description;
+    }
 
-public String getDate() {
-    return date;
-}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-public void setDate(String date) {
-    this.date = date;
-}
+    public int getUserId() {
+        return userId;
+    }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-public String getDescription() {
-    return description;
-}
-
-
-public void setDescription(String description) {
-    this.description = description;
-}
-
-
-public String toString() {
-    return "Event{" +
-            "id=" + id +
-            ", nom='" + nom + '\'' +
-            ", date='" + date + '\'' +
-            ", description='" + description + '\'' +
-            '}';
-}
-
+  
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", date='" + date + '\'' +
+                ", description='" + description + '\'' +
+                ", userId=" + userId +
+                '}';
+    }
 }

@@ -18,12 +18,13 @@ public class eventImpl  implements eventDao{
     @Override
     public void addEvent(event event) {
        try {
-            String sql = "INSERT INTO events (id, nom,date,description ) VALUES (?, ?, ?,?)";
+            String sql = "INSERT INTO events (id, nom,date,description ,id_user ) VALUES (?, ?, ?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, event.getId());
             pstmt.setString(2, event.getNom());
             pstmt.setString(3, event.getDate());
             pstmt.setString(4, event.getDescription());
+            pstmt.setInt(5, event.getUserId());
          
             pstmt.executeUpdate();
           
@@ -46,7 +47,8 @@ public class eventImpl  implements eventDao{
                     rs.getInt("id"),
                     rs.getString("nom"),
                     rs.getString("date"),
-                    rs.getString("description")
+                    rs.getString("description"),
+                    rs.getInt("id_user")
                   
                 );
             }
@@ -69,8 +71,8 @@ public class eventImpl  implements eventDao{
                 rs.getInt("id"),
                 rs.getString("nom"),
                 rs.getString("date"),
-                
-                rs.getString("description")
+                rs.getString("description"),
+                rs.getInt("id_user")
             ));
         }
         
@@ -83,12 +85,14 @@ public class eventImpl  implements eventDao{
     @Override
     public void updateEvent(event event) {
         try {
-            String sql = "UPDATE events SET nom= ?, date= ?, description= ? WHERE id = ?";
+            String sql = "UPDATE events SET nom= ?, date= ?, description= ?, id_user= ? WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, event.getNom());
             pstmt.setString(2, event.getDate());
      
             pstmt.setString(3, event.getDescription());
+            pstmt.setInt(4, event.getUserId());
+            pstmt.setInt(5, event.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
