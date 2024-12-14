@@ -15,6 +15,7 @@ public class Main extends Application {
     private UserDao userDao;
     private eventDao eventDao;
     private salleDao salleDao;
+    private terrainDao terrainDao;
 
     @Override
     public void start(Stage primaryStage) {
@@ -22,6 +23,7 @@ public class Main extends Application {
         userDao = new UserImpl(conn);
         eventDao = new eventImpl(conn);
         salleDao = new salleDaoImpl(conn);
+        terrainDao = new terrainDaoImpl(conn);
 
         // Labels and Fields for User
         Label idLabel = new Label("ID:");
@@ -133,9 +135,25 @@ public class Main extends Application {
         TextArea salleResultArea = new TextArea();
         salleResultArea.setEditable(false);
 
+         // Labels and Fields for terrain
+         Label TerrainIdLabel = new Label("Terrain ID:");
+         TextField TerrainIdField = new TextField();
+ 
+         Label TerrainNameLabel = new Label("Terrain Name:");
+         TextField TerrainNameField = new TextField();
+ 
+         Label TerrainTypeLabel = new Label("type:");
+         TextField TerrainTypeField = new TextField();
+ 
+         Button addTerrainButton = new Button("Add Terrain");
+         Button viewTerrainButton = new Button("View All Terrains");
+ 
+         TextArea TerrainResultArea = new TextArea();
+         TerrainResultArea.setEditable(false);
+
         // GridPane Layout for salles
         GridPane salleGrid = new GridPane();
-        salleGrid.setPadding(new Insets(10));
+        salleGrid.setPadding(new Insets(4));
         salleGrid.setVgap(5);
         salleGrid.setHgap(10);
 
@@ -152,10 +170,29 @@ public class Main extends Application {
         salleGrid.add(viewSalleButton, 1, 3);
 
         salleGrid.add(salleResultArea, 0, 4, 2, 1);
+ // GridPane Layout for terrains
+ GridPane terrainGrid = new GridPane();
+ terrainGrid.setPadding(new Insets(5));
+ terrainGrid.setVgap(5);
+ terrainGrid.setHgap(5);
+
+ terrainGrid.add(TerrainIdLabel, 0, 0);
+ terrainGrid.add(TerrainIdField, 1, 0);
+
+ terrainGrid.add(TerrainNameLabel, 0, 1);
+ terrainGrid.add(TerrainNameField, 1, 1);
+
+ terrainGrid.add(TerrainTypeLabel, 0, 2);
+ terrainGrid.add(TerrainTypeField, 1, 2);
+
+ terrainGrid.add(addTerrainButton, 0, 3);
+ terrainGrid.add(viewTerrainButton, 1, 3);
+
+ terrainGrid.add(TerrainResultArea, 0, 4, 2, 1);
 
         // VBox Root Layout
-        VBox root = new VBox(20, userGrid, eventGrid, salleGrid);
-        root.setPadding(new Insets(10));
+        VBox root = new VBox(20, userGrid, eventGrid, salleGrid, terrainGrid);
+        root.setPadding(new Insets(5));
 
         // Add User Button Action
         addUserButton.setOnAction(event -> {
@@ -252,12 +289,49 @@ public class Main extends Application {
             }
             salleResultArea.setText(result.toString());
         });
-
-        // Scene and Stage
-        Scene scene = new Scene(root, 900, 800);
-        primaryStage.setTitle("User, Event, and Salle Manager");
+        addTerrainButton.setOnAction(e->{
+            try {
+                int id = Integer.parseInt(TerrainIdField.getText());
+                String nomTerrain = TerrainNameField.getText();
+               String type = TerrainTypeField.getText();
+              terrain terrain= new terrain(id, nomTerrain, type);
+                terrainDao.addTerrain(terrain);
+                TerrainResultArea.setText("terrain added: " + terrain);
+                TerrainIdField.clear();
+                TerrainNameField.clear();
+                TerrainTypeField.clear();
+            } catch (Exception ee) {
+                TerrainResultArea.setText("Error: " + ee.getMessage());
+            }
+        });
+        viewTerrainButton.setOnAction(event -> {
+            List<terrain> Terrains = terrainDao.getAllTerrains();
+            StringBuilder result = new StringBuilder("List of Terrains:\n");
+            for (terrain TerrainItem : Terrains) {
+                result.append(TerrainItem).append("\n");
+            }
+            TerrainResultArea.setText(result.toString());
+        });
+        ScrollPane terrainScrollPane = new ScrollPane(terrainGrid);
+        terrainScrollPane.setFitToWidth(true);
+        terrainScrollPane.setFitToHeight(true);
+        
+     
+        
+        TitledPane userPane = new TitledPane("User", userGrid);
+        TitledPane eventPane = new TitledPane("Event", eventGrid);
+        TitledPane sallePane = new TitledPane("Salle", salleGrid);
+        TitledPane terrainPane = new TitledPane("Terrain", terrainGrid);
+        
+        Accordion accordion = new Accordion(userPane, eventPane, sallePane, terrainPane);
+        
+        Scene scene = new Scene(accordion, 800, 600);
         primaryStage.setScene(scene);
-        primaryStage.show();
+        
+                primaryStage.setWidth(800); 
+                primaryStage.setHeight(900);
+                primaryStage.setResizable(false);
+                primaryStage.show();
     }
 
     @Override
