@@ -16,6 +16,7 @@ public class Main extends Application {
     private eventDao eventDao;
     private salleDao salleDao;
     private terrainDao terrainDao;
+    private reservationDao reservationDao;
 
     @Override
     public void start(Stage primaryStage) {
@@ -24,6 +25,7 @@ public class Main extends Application {
         eventDao = new eventImpl(conn);
         salleDao = new salleDaoImpl(conn);
         terrainDao = new terrainDaoImpl(conn);
+        reservationDao = new reservationDaoImpl(conn);
 
         // Labels and Fields for User
         Label idLabel = new Label("ID:");
@@ -151,6 +153,27 @@ public class Main extends Application {
          TextArea TerrainResultArea = new TextArea();
          TerrainResultArea.setEditable(false);
 
+          // Labels and Fields for full reseravtion
+          Label ReservationIdLabel = new Label("Reservation ID:");
+          TextField ReservationIdField = new TextField();
+  
+          Label ReservationIdUserLabel = new Label("Reservation ID user:");
+          TextField ReservationIdUserField = new TextField();
+          Label ReservationIdEventLabel = new Label("Reservation ID event:");
+          TextField ReservationIdEventField = new TextField();
+          Label ReservationIdSalleLabel = new Label("Reservation ID salle:");
+          TextField ReservationIdSalleField = new TextField();
+          Label ReservationIdTerrainLabel = new Label("Reservation ID terrain:");
+          TextField ReservationIdTerrainField = new TextField();
+          Label ReservationDateLabel = new Label("Reservation Date:");
+          TextField ReservationDateField = new TextField();
+          Button addReservationButton = new Button("Add Reservation");
+          Button viewReservationButton = new Button("View All Reservations");
+  
+          TextArea ReservationResultArea = new TextArea();
+          ReservationResultArea.setEditable(false);
+ 
+
         // GridPane Layout for salles
         GridPane salleGrid = new GridPane();
         salleGrid.setPadding(new Insets(4));
@@ -189,9 +212,39 @@ public class Main extends Application {
  terrainGrid.add(viewTerrainButton, 1, 3);
 
  terrainGrid.add(TerrainResultArea, 0, 4, 2, 1);
+ 
+       // GridPane Layout for reservation
+GridPane reservationGrid = new GridPane();
+reservationGrid.setPadding(new Insets(5));
+reservationGrid.setVgap(5);
+reservationGrid.setHgap(5);
 
+// Placing components in a logical order without overlaps
+reservationGrid.add(ReservationIdLabel, 0, 0);
+reservationGrid.add(ReservationIdField, 1, 0);
+
+reservationGrid.add(ReservationIdUserLabel, 0, 1);
+reservationGrid.add(ReservationIdUserField, 1, 1);
+
+reservationGrid.add(ReservationIdSalleLabel, 0, 2);
+reservationGrid.add(ReservationIdSalleField, 1, 2);
+
+reservationGrid.add(ReservationIdEventLabel, 0, 3);
+reservationGrid.add(ReservationIdEventField, 1, 3);
+
+reservationGrid.add(ReservationIdTerrainLabel, 0, 4);
+reservationGrid.add(ReservationIdTerrainField, 1, 4);
+
+reservationGrid.add(ReservationDateLabel, 0, 5);
+reservationGrid.add(ReservationDateField, 1, 5);
+
+reservationGrid.add(addReservationButton, 0, 6);
+reservationGrid.add(viewReservationButton, 1, 6);
+
+// Spanning the result area across two columns
+reservationGrid.add(ReservationResultArea, 0, 7, 2, 1);
         // VBox Root Layout
-        VBox root = new VBox(20, userGrid, eventGrid, salleGrid, terrainGrid);
+        VBox root = new VBox(20, userGrid, eventGrid, salleGrid, terrainGrid, reservationGrid);
         root.setPadding(new Insets(5));
 
         // Add User Button Action
@@ -312,9 +365,44 @@ public class Main extends Application {
             }
             TerrainResultArea.setText(result.toString());
         });
-        ScrollPane terrainScrollPane = new ScrollPane(terrainGrid);
+
+        addReservationButton.setOnAction(event -> {
+            try {
+                int id = Integer.parseInt(ReservationIdField.getText());
+                int id_user = Integer.parseInt(ReservationIdUserField.getText());
+                int id_event = Integer.parseInt(ReservationIdEventField.getText());
+                int id_salle = Integer.parseInt(ReservationIdSalleField.getText());
+                int id_terrain = Integer.parseInt(ReservationIdTerrainField.getText());
+                String date_reservation= ReservationDateField.getText();
+              
+
+                reservation newReservation = new reservation(id, id_user, id_event, id_salle, id_terrain, date_reservation);
+                reservationDao.addReservation(newReservation);
+
+                ReservationResultArea.setText("Reservation added: " + newReservation);
+                ReservationIdField.clear();
+                ReservationIdEventField.clear();
+                ReservationIdSalleField.clear();
+                ReservationIdTerrainField.clear();
+                ReservationIdUserField.clear();
+                ReservationDateField.clear();
+                typeComboBox.getSelectionModel().clearSelection();
+            } catch (Exception e) {
+                ReservationResultArea.setText("Error: " + e.getMessage());
+            }
+        });
+        viewReservationButton.setOnAction(event -> {
+            List<reservation> reservations = reservationDao.getAllReservations();
+            StringBuilder result = new StringBuilder("List of reservations:\n");
+            for (reservation reservationItem : reservations) {
+                result.append(reservationItem).append("\n");
+            }
+            ReservationResultArea.setText(result.toString());
+        });
+        
+       /* ScrollPane terrainScrollPane = new ScrollPane(terrainGrid);
         terrainScrollPane.setFitToWidth(true);
-        terrainScrollPane.setFitToHeight(true);
+        terrainScrollPane.setFitToHeight(true); */
         
      
         
@@ -322,8 +410,9 @@ public class Main extends Application {
         TitledPane eventPane = new TitledPane("Event", eventGrid);
         TitledPane sallePane = new TitledPane("Salle", salleGrid);
         TitledPane terrainPane = new TitledPane("Terrain", terrainGrid);
+        TitledPane reservationPane = new TitledPane("Reservation" , reservationGrid);
         
-        Accordion accordion = new Accordion(userPane, eventPane, sallePane, terrainPane);
+        Accordion accordion = new Accordion(userPane, eventPane, sallePane, terrainPane, reservationPane);
         
         Scene scene = new Scene(accordion, 800, 600);
         primaryStage.setScene(scene);
